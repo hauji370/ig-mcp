@@ -46,6 +46,7 @@ WORKDIR /app
 COPY src/ ./src/
 COPY config/ ./config/
 COPY scripts/ ./scripts/
+COPY server_http.py .
 
 # Create necessary directories
 RUN mkdir -p logs cache && \
