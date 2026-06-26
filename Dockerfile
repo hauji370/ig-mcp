@@ -1,5 +1,5 @@
-# Multi-stage build for Instagram MCP Server
-FROM python:3.14.0-slim as builder
+# Instagram MCP Server - Fixed Dockerfile
+FROM python:3.13-slim as builder
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -23,7 +23,7 @@ RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
 # Production stage
-FROM python:3.14.0-slim as production
+FROM python:3.13-slim as production
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -57,9 +57,9 @@ USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import src.config; print('Health check passed')" || exit 1
+    CMD curl -f http://localhost:${PORT:-8000}/mcp || exit 1
 
-# Expose port (if running as HTTP server)
+# Expose port
 EXPOSE 8000
 
 # Default command
