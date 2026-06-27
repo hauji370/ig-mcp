@@ -25,9 +25,9 @@ class InstagramMCPSettings(BaseSettings):
     )
 
     # API Configuration
-    instagram_api_version: str = Field("v19.0", description="Instagram API version")
+    instagram_api_version: str = Field("v21.0", description="Instagram API version")
     instagram_api_base_url: str = Field(
-        "https://graph.facebook.com", description="Instagram API base URL"
+        "https://graph.instagram.com", description="Instagram API base URL"
     )
 
     # Rate Limiting Configuration
