@@ -296,10 +296,7 @@ class InstagramClient:
     ) -> InstagramProfile:
         """Get Instagram business profile information."""
         if not account_id:
-            account_id = self.settings.instagram_business_account_id
-
-        if not account_id:
-            raise InstagramAPIError("Instagram business account ID not configured")
+            account_id = self.settings.instagram_business_account_id or "me"
 
         fields = [
             "id",
@@ -330,10 +327,7 @@ class InstagramClient:
     ) -> List[InstagramMedia]:
         """Get recent media posts from Instagram account."""
         if not account_id:
-            account_id = self.settings.instagram_business_account_id
-
-        if not account_id:
-            raise InstagramAPIError("Instagram business account ID not configured")
+            account_id = self.settings.instagram_business_account_id or "me"
 
         fields = [
             "id",
@@ -408,7 +402,7 @@ class InstagramClient:
 
     async def publish_media(self, request: PublishMediaRequest) -> PublishMediaResponse:
         """Publish media to Instagram account."""
-        account_id = self.settings.instagram_business_account_id
+        account_id = self.settings.instagram_business_account_id or "me"
         if not account_id:
             raise InstagramAPIError("Instagram business account ID not configured")
 
@@ -452,17 +446,23 @@ class InstagramClient:
             raise InstagramAPIError(f"Failed to publish media: {str(e)}")
 
     async def get_account_pages(self) -> List[FacebookPage]:
-        """Get Facebook pages connected to the account."""
-        params = {"fields": "id,name,instagram_business_account"}
+        """Return the connected Instagram account.
+
+        With Instagram Login the access token represents the Instagram
+        professional account directly, so there are no Facebook Pages to
+        enumerate. We surface the account itself (via the /me node) so callers
+        that expect a list of "pages" keep working.
+        """
+        params = {"fields": "id,username"}
 
         try:
-            data = await self._make_request("GET", "me/accounts", params=params)
-            pages = []
-
-            for item in data.get("data", []):
-                pages.append(FacebookPage(**item))
-
-            return pages
+            data = await self._make_request("GET", "me", params=params)
+            page = FacebookPage(
+                id=data.get("id", ""),
+                name=data.get("username", "instagram_account"),
+                instagram_business_account={"id": data.get("id", "")},
+            )
+            return [page]
 
         except Exception as e:
             logger.error("Failed to get account pages", error=str(e))
@@ -476,10 +476,7 @@ class InstagramClient:
     ) -> List[AccountInsight]:
         """Get account-level insights."""
         if not account_id:
-            account_id = self.settings.instagram_business_account_id
-
-        if not account_id:
-            raise InstagramAPIError("Instagram business account ID not configured")
+            account_id = self.settings.instagram_business_account_id or "me"
 
         if not metrics:
             metrics = ["reach", "profile_views", "website_clicks"]
