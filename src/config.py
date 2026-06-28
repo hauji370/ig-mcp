@@ -20,6 +20,7 @@ class InstagramMCPSettings(BaseSettings):
     instagram_access_token: str = Field(..., description="Instagram access token")
     facebook_app_id: str = Field(..., description="Facebook app ID")
     facebook_app_secret: str = Field(..., description="Facebook app secret")
+    instagram_app_secret: str = Field("", description="Instagram app secret (for token auto-refresh)")
     instagram_business_account_id: Optional[str] = Field(
         None, description="Instagram business account ID"
     )
