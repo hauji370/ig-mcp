@@ -1,3 +1,4 @@
+import asyncio
 import contextlib
 import os
 from collections.abc import AsyncIterator
@@ -11,6 +12,8 @@ from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
 from mcp.server.transport_security import TransportSecuritySettings
 
 from src.instagram_mcp_server import InstagramMCPServer
+from src.config import get_settings
+from src.token_refresh import token_refresh_loop
 
 # Build the Instagram MCP server (low-level Server instance lives at .server)
 ig_server = InstagramMCPServer()
@@ -35,8 +38,14 @@ async def handle_mcp(scope: Scope, receive: Receive, send: Send) -> None:
 
 @contextlib.asynccontextmanager
 async def lifespan(app: Starlette) -> AsyncIterator[None]:
+    # Start the background token auto-refresh loop (renews the 60-day Instagram
+    # token every ~50 days so it never expires).
+    refresh_task = asyncio.create_task(token_refresh_loop(get_settings()))
     async with session_manager.run():
-        yield
+        try:
+            yield
+        finally:
+            refresh_task.cancel()
 
 
 # Mount the MCP handler at ROOT. The StreamableHTTP session manager ignores the
