@@ -379,6 +379,7 @@ class InstagramClient:
                 InsightMetric.COMMENTS,
                 InsightMetric.SHARES,
                 InsightMetric.SAVED,
+                InsightMetric.VIEWS,
             ]
 
         params = {"metric": ",".join([m.value for m in metrics])}
