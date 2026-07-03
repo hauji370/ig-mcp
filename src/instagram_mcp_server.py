@@ -123,13 +123,13 @@ class InstagramMCPServer:
                                         "comments",
                                         "shares",
                                         "saved",
-                                        "video_views",
+                                        "views",
                                     ],
                                 },
                                 "description": (
                                     "Specific metrics to retrieve (optional, "
                                     "gets all available if not specified). "
-                                    "Note: video_views only works for video posts"
+                                    "Note: views only works for video posts"
                                 ),
                             },
                         },
